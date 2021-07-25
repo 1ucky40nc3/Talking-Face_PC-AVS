@@ -168,7 +168,7 @@ class AudioConfig:
 
         Args:
             audio_path (str): Path to an audio file.
-            wav (torch.Tensor, Optional): Wav data as 1 dimensional Float32 Tensor.
+            wav (torch.Tensor, Optional): Wav data with 16 kHz sample rate as 1d Float32 Tensor.
         """
         if wav is None:
             wav = self.load_wav(audio_path)

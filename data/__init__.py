@@ -38,7 +38,7 @@ def create_dataloader(opt, wav=None):
 
     Args:
         opt (argparse.Namespace): Options packaged as a Namespace object.
-        wav (torch.Tensor, Optional): Wav data as 1 dimensional Float32 Tensor.
+        wav (torch.Tensor, Optional): Wav data with 16 kHz sample rate as 1d Float32 Tensor.
     """
     dataset_modes = opt.dataset_mode.split(',')
     if len(dataset_modes) == 1:
