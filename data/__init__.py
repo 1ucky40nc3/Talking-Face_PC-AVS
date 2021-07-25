@@ -33,12 +33,18 @@ def get_option_setter(dataset_name):
     return dataset_class.modify_commandline_options
 
 
-def create_dataloader(opt):
+def create_dataloader(opt, wav=None):
+    """Create a dataloader.
+
+    Args:
+        opt (argparse.Namespace): Options packaged as a Namespace object.
+        wav (torch.Tensor, Optional): Wav data as 1 dimensional Float32 Tensor.
+    """
     dataset_modes = opt.dataset_mode.split(',')
     if len(dataset_modes) == 1:
         dataset = find_dataset_using_name(opt.dataset_mode)
         instance = dataset()
-        instance.initialize(opt)
+        instance.initialize(opt, wav=wav)
         print("dataset [%s] of size %d was created" %
               (type(instance).__name__, len(instance)))
         if not opt.isTrain:

@@ -163,8 +163,16 @@ class AudioConfig:
     def _denormalize(self, S):
         return (np.clip(S, 0, 1) * -self.min_level_db) + self.min_level_db
 
-    def read_audio(self, audio_path):
-        wav = self.load_wav(audio_path)
+    def read_audio(self, audio_path, wav=None):
+        """Read audio.
+
+        Args:
+            audio_path (str): Path to an audio file.
+            wav (torch.Tensor, Optional): Wav data as 1 dimensional Float32 Tensor.
+        """
+        if wav is None:
+            wav = self.load_wav(audio_path)
+
         if self.norm_audio:
             wav = self.audio_normalize(wav)
         else:

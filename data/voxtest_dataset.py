@@ -54,7 +54,14 @@ class VOXTestDataset(BaseDataset):
         start_audio_inds = start_frame_ind * self.audio.num_bins_per_frame
         return start_audio_inds
 
-    def initialize(self, opt):
+    def initialize(self, opt, wav=None):
+        """Initialize the dataset.
+
+        Args:
+            opt (argparse.Namespace): Options packaged as a Namespace object.
+            wav (torch.Tensor, Optional): Wav data as 1 dimensional Float32 Tensor.
+        """
+
         self.opt = opt
         self.path_label = opt.path_label
         self.clip_len = opt.clip_len
@@ -92,7 +99,7 @@ class VOXTestDataset(BaseDataset):
 
 
         if not os.path.isfile(spectrogram_path):
-            wav = self.audio.read_audio(audio_path)
+            wav = self.audio.read_audio(audio_path, wav=wav)
             self.spectrogram = self.audio.audio_to_spectrogram(wav)
 
         else:
