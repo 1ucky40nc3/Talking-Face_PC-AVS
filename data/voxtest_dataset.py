@@ -116,8 +116,7 @@ class VOXTestDataset(BaseDataset):
 
         self.dataset_size = len(self.target_frame_inds)
 
-        id_img_paths = glob.glob(id_path)
-        self.id_img_tensor = torch.stack(self.to_Tensor(self.load_img(image_path)))
+        self.id_img_tensor = self.to_Tensor(self.load_img(id_path)).unsqueeze(0)
         self.pose_frame_path = pose_frame_path
         self.audio_path = audio_path
         self.id_path = id_path
