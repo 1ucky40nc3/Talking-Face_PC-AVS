@@ -116,12 +116,29 @@ class VOXTestDataset(BaseDataset):
 
         self.dataset_size = len(self.target_frame_inds)
 
-        self.id_img_tensor = self.to_Tensor(self.load_img(id_path)).unsqueeze(0)
+        id_img_paths = glob.glob(os.path.join(id_path, '*.jpg')) + glob.glob(os.path.join(id_path, '*.png'))
+        random.shuffle(id_img_paths)
+        opt.num_inputs = min(len(id_img_paths), opt.num_inputs)
+        id_img_tensors = []
+
+        for i, image_path in enumerate(id_img_paths):
+            id_img_tensor = self.to_Tensor(self.load_img(image_path))
+            id_img_tensors += [id_img_tensor]
+            shutil.copyfile(image_path, os.path.join(self.processed_file_savepath, 'ref_id_{}.jpg'.format(i)))
+            if i == (opt.num_inputs - 1):
+                break
+        self.id_img_tensor = torch.stack(id_img_tensors)
         self.pose_frame_path = pose_frame_path
         self.audio_path = audio_path
         self.id_path = id_path
         self.mouth_frame_path = mouth_frame_path
         self.initialized = False
+
+
+    def paths_match(self, path1, path2):
+        filename1_without_ext = os.path.splitext(os.path.basename(path1)[-10:])[0]
+        filename2_without_ext = os.path.splitext(os.path.basename(path2)[-10:])[0]
+        return filename1_without_ext == filename2_without_ext
 
     def load_one_frame(self, frame_ind, video_path, M=None, crop=True):
         filepath = os.path.join(video_path, self.filename_tmpl.format(frame_ind))
