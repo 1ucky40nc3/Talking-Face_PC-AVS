@@ -117,17 +117,7 @@ class VOXTestDataset(BaseDataset):
         self.dataset_size = len(self.target_frame_inds)
 
         id_img_paths = glob.glob(id_path)
-        random.shuffle(id_img_paths)
-        opt.num_inputs = min(len(id_img_paths), opt.num_inputs)
-        id_img_tensors = []
-
-        for i, image_path in enumerate(id_img_paths):
-            id_img_tensor = self.to_Tensor(self.load_img(image_path))
-            id_img_tensors += [id_img_tensor]
-            shutil.copyfile(image_path, os.path.join(self.processed_file_savepath, 'ref_id_{}.jpg'.format(i)))
-            if i == (opt.num_inputs - 1):
-                break
-        self.id_img_tensor = torch.stack(id_img_tensors)
+        self.id_img_tensor = torch.stack(self.to_Tensor(self.load_img(image_path)))
         self.pose_frame_path = pose_frame_path
         self.audio_path = audio_path
         self.id_path = id_path
