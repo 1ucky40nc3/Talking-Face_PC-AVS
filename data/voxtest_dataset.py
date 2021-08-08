@@ -123,12 +123,6 @@ class VOXTestDataset(BaseDataset):
         self.mouth_frame_path = mouth_frame_path
         self.initialized = False
 
-
-    def paths_match(self, path1, path2):
-        filename1_without_ext = os.path.splitext(os.path.basename(path1)[-10:])[0]
-        filename2_without_ext = os.path.splitext(os.path.basename(path2)[-10:])[0]
-        return filename1_without_ext == filename2_without_ext
-
     def load_one_frame(self, frame_ind, video_path, M=None, crop=True):
         filepath = os.path.join(video_path, self.filename_tmpl.format(frame_ind))
         img = self.load_img(filepath, M=M, crop=crop)
