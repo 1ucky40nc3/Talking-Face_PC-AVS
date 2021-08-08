@@ -116,7 +116,7 @@ class VOXTestDataset(BaseDataset):
 
         self.dataset_size = len(self.target_frame_inds)
 
-        id_img_paths = glob.glob(os.path.join(id_path, '*.jpg')) + glob.glob(os.path.join(id_path, '*.png'))
+        id_img_paths = glob.glob(id_path)
         random.shuffle(id_img_paths)
         opt.num_inputs = min(len(id_img_paths), opt.num_inputs)
         id_img_tensors = []
