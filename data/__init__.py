@@ -40,46 +40,21 @@ def create_dataloader(opt, wav=None):
         opt (argparse.Namespace): Options packaged as a Namespace object.
         wav (torch.Tensor, Optional): Wav data with 16 kHz sample rate as 1d Float32 Tensor.
     """
-    dataset_modes = opt.dataset_mode.split(',')
-    if len(dataset_modes) == 1:
-        dataset = find_dataset_using_name(opt.dataset_mode)
-        instance = dataset()
-        instance.initialize(opt, wav=wav)
-        print("dataset [%s] of size %d was created" %
-              (type(instance).__name__, len(instance)))
-        if not opt.isTrain:
-            shuffle = False
-        else:
-            shuffle = True
-        dataloader = torch.utils.data.DataLoader(
-            instance,
-            batch_size=opt.batchSize,
-            shuffle=shuffle,
-            num_workers=int(opt.nThreads),
-            drop_last=opt.isTrain
-        )
-        return dataloader
+    dataset = find_dataset_using_name(opt.dataset_mode)
+    instance = dataset()
+    instance.initialize(opt, wav=wav)
 
-    else:
-        dataloader_dict = {}
-        for dataset_mode in dataset_modes:
-            dataset = find_dataset_using_name(dataset_mode)
-            instance = dataset()
-            instance.initialize(opt)
-            print("dataset [%s] of size %d was created" %
-                  (type(instance).__name__, len(instance)))
-            if not opt.isTrain:
-                shuffle = not opt.defined_driven
-            else:
-                shuffle = True
-            dataloader = torch.utils.data.DataLoader(
-                instance,
-                batch_size=opt.batchSize,
-                shuffle=shuffle,
-                num_workers=int(opt.nThreads),
-                drop_last=opt.isTrain
-            )
-            dataloader_dict[dataset_mode] = dataloader
-        return dataloader_dict
+    print("dataset [%s] of size %d was created" %
+            (type(instance).__name__, len(instance)))
+
+    dataloader = torch.utils.data.DataLoader(
+        instance,
+        batch_size=opt.batchSize,
+        shuffle=opt.isTrain,
+        num_workers=int(opt.nThreads),
+        drop_last=opt.isTrain
+    )
+
+    return dataloader
 
 
