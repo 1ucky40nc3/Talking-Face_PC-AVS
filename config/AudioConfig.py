@@ -7,14 +7,14 @@ import lws
 
 
 class AudioConfig:
-    def __init__(self, frame_rate=25,
-                       sample_rate=16000,
-                       num_mels=80,
-                       fft_size=1280,
-                       hop_size=160,
-                       num_frames_per_clip=5,
-                       save_mel=True
-                ):
+    def __init__(self, 
+                 frame_rate=25,
+                 sample_rate=16000,
+                 num_mels=80,
+                 fft_size=1280,
+                 hop_size=160,
+                 num_frames_per_clip=5,
+                 save_mel=True):
         self.frame_rate = frame_rate
         self.sample_rate = sample_rate
         self.num_bins_per_frame = int(sample_rate / hop_size / frame_rate)
@@ -45,14 +45,20 @@ class AudioConfig:
         return samples
 
     def generate_spectrogram_magphase(self, audio):
-        spectro = librosa.core.stft(audio, hop_length=self.get_hop_size(), n_fft=self.fft_size, center=True)
+        spectro = librosa.core.stft(
+            audio, 
+            hop_length=self.get_hop_size(), 
+            n_fft=self.fft_size, 
+            center=True)
+
         spectro_mag, spectro_phase = librosa.core.magphase(spectro)
         spectro_mag = np.expand_dims(spectro_mag, axis=0)
+
         if self.with_phase:
-            spectro_phase = np.expand_dims(np.angle(spectro_phase), axis=0)
+            spectro_phase = np.expand_dims(
+                np.angle(spectro_phase), axis=0)
             return spectro_mag, spectro_phase
-        else:
-            return spectro_mag
+        return spectro_mag
 
     def save_wav(self, wav, path):
         wav *= 32767 / max(0.01, np.max(np.abs(wav)))
@@ -105,15 +111,18 @@ class AudioConfig:
     def melspectrogram(self, y):
         D = self._lws_processor().stft(y).T
         S = self._amp_to_db(self._linear_to_mel(np.abs(D))) - self.ref_level_db
+        
         if not self.allow_clipping_in_normalization:
             assert S.max() <= 0 and S.min() - self.min_level_db >= 0
         return self._normalize(S)
 
     def get_hop_size(self):
         hop_size = self.hop_size
+
         if hop_size is None:
             assert self.frame_shift_ms is not None
             hop_size = int(self.frame_shift_ms / 1000 * self.sample_rate)
+
         return hop_size
 
     def _lws_processor(self):
@@ -124,10 +133,8 @@ class AudioConfig:
         """
         pad = (fsize - fshift)
         if length % fshift == 0:
-            M = (length + pad * 2 - fsize) // fshift + 1
-        else:
-            M = (length + pad * 2 - fsize) // fshift + 2
-        return M
+            return (length + pad * 2 - fsize) // fshift + 1
+        return (length + pad * 2 - fsize) // fshift + 2
 
     def lws_pad_lr(self, x, fsize, fshift):
         """Compute left and right padding lws internally uses
@@ -146,9 +153,12 @@ class AudioConfig:
 
     def _build_mel_basis(self):
         assert self.fmax <= self.sample_rate // 2
-        return librosa.filters.mel(self.sample_rate, self.fft_size,
-                                   fmin=self.fmin, fmax=self.fmax,
-                                   n_mels=self.num_mels)
+        return librosa.filters.mel(
+            self.sample_rate, 
+            self.fft_size,
+            fmin=self.fmin, 
+            fmax=self.fmax,
+            n_mels=self.num_mels)
 
     def _amp_to_db(self, x):
         min_level = np.exp(self.min_level_db / 20 * np.log(10))
